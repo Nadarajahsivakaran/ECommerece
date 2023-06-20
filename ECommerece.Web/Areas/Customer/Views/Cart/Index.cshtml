@@ -1,0 +1,44 @@
+﻿@inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> UserManager
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Sub Total</th>
+        </tr>
+    </thead>
+    <tbody id="cart-table-body">
+    </tbody>
+
+</table>
+
+<button class="btn btn-success">Check out</button>
+
+@section scripts{
+    <script>
+        getCartDatas();
+        function getCartDatas() {
+            var cart = JSON.parse(localStorage.getItem("Cart"));
+            var userId = "@UserManager.GetUserId(User)";
+            var myCart = cart.find(user => user.userId == userId);
+
+            var tbodyContext = "";
+            var totalAmount = 0.00;
+            myCart.items.forEach((product) => {
+                totalAmount += product.unitPrice * product.quantity;
+                tbodyContext += "<tr>";
+                tbodyContext += `<td>${product.productName}</td>`;
+                tbodyContext += `<td>${product.quantity}</td>`;
+                tbodyContext += `<td>${product.unitPrice}</td>`;
+                tbodyContext += `<td>${product.unitPrice * product.quantity}</td>`;
+                tbodyContext += "</tr>";
+            });
+            tbodyContext += `<tr><td></td><td></td><td></td><td>${totalAmount}</td></tr>`;
+            var tbody = document.getElementById("cart-table-body");
+            tbody.innerHTML = tbodyContext;
+            
+        }
+    </script>
+}

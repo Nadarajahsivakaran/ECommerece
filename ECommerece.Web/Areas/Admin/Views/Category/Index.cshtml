@@ -1,0 +1,43 @@
+﻿@model IEnumerable<Category>
+
+<div class="row">
+    <div class="col">
+        <div class="float-start"><h1>All Category</h1></div>
+        <div class="float-end"><a asp-action="Upsert" class="btn btn-success">Create New</a></div>
+    </div>
+</div>
+
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Count()>0)
+        {
+            @foreach (var category in Model)
+            {
+                <tr>
+                    <td>@category.Name</td>
+                    <td>@category.Description</td>
+                    <td>
+                        <a asp-action="Upsert"  asp-route-id="@category.Id" class="btn btn-primary">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@category.Id"  class="btn btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3">No Records</td>
+            </tr>
+        }
+
+
+    </tbody>
+</table>

@@ -1,0 +1,51 @@
+﻿@model IEnumerable<Product>
+
+<div class="row">
+    <div class="col">
+        <div class="float-start"><h1>All Products</h1></div>
+        <div class="float-end"><a asp-action="Upsert" class="btn btn-success">Create New</a></div>
+    </div>
+</div>
+
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Unit Price</th>
+            <th>Image</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Count() > 0)
+        {
+            @foreach (var product in Model)
+            {
+                <tr>
+                    <td>@product.Name</td>
+                    <td>@product.Description</td>
+                    <td>@product.Category.Name</td>
+                    <td>@product.UnitPrice</td>
+                    <td>
+                        <img alt="@product.Name" src="/Product/@product.ImageUrl" style="width:70px; height:50px;"/>
+                    </td>
+                    <td>
+                        <a asp-action="Upsert" asp-route-id="@product.Id" class="btn btn-primary">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@product.Id" class="btn btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3">No Records</td>
+            </tr>
+        }
+
+
+    </tbody>
+</table>

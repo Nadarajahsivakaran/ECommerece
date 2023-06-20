@@ -1,0 +1,93 @@
+﻿@model IEnumerable<Product>
+@inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> UserManager
+
+<div class="row">
+    @if (Model.Count() > 0)
+    {
+        @foreach (var product in Model)
+        {
+            <div class="col-3">
+
+                <div class="card mb-3">
+                    <img class="card-img-top" src="./Product/@product.ImageUrl" alt="@product.Name">
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Name</h5>
+                        <h6>Category : @product.Category.Name</h6>
+                        <h6>Unit Prie : @product.UnitPrice</h6>
+                        <p class="card-text">@product.Description</p>
+                        <button onclick="AddToCart(@product.Id,'@product.Name',@product.UnitPrice)" class="btn btn-primary">Add To Cart</button>
+                    </div>
+                </div>
+            </div>
+        }
+
+    }
+</div>
+
+@section scripts{
+    <script>
+        function AddToCart(productId,productName,unitPrice) {
+            //check use login or not
+            var isAuthenticated = @User.Identity.IsAuthenticated.ToString().ToLower();
+
+            if (isAuthenticated) {
+                var userId = "@UserManager.GetUserId(User)";
+
+                if (!localStorage.getItem("Cart"))
+                    localStorage.setItem("Cart", JSON.stringify([]));
+
+                var cart = JSON.parse(localStorage.getItem("Cart"));
+                console.log(cart);
+                var isUserInCart = cart.find(user => user.userId == userId);
+
+                //update the userCart
+                if (isUserInCart) {
+
+                    var isInProduct = isUserInCart.items.find(product => product.productId == productId);
+
+                    //check product is alreaddy there
+                    if (isInProduct) {
+                        isInProduct.quantity++;
+                    }
+                    else {
+                        var createProduct = {
+                            productId,
+                            productName,
+                            quantity: 1,
+                            unitPrice
+                        }
+                        isUserInCart.items.push(createProduct);
+                    }
+                }
+                //create the user cart
+                else {
+                    var userCart = {
+                        userId,
+                        items: [
+                            {
+                                productId,
+                                productName,
+                                quantity: 1,
+                                unitPrice
+                            }
+                        ]
+                    }
+                    cart.push(userCart);
+                }
+                console.log(cart);
+                var updatedUserCart = cart.find(user => user.userId == userId)
+
+                // Calculate the total count of the quantity column
+                var totalQuantity = updatedUserCart.items.reduce((accumulator, product) => accumulator + product.quantity, 0);
+                var getCartCountId = document.getElementById("cartCount");
+                getCartCountId.childNodes[2].nodeValue = totalQuantity
+                localStorage.setItem("Cart", JSON.stringify(cart));
+
+            }
+            else {
+                window.location.href = "/Identity/Account/Login";
+            }
+        }
+
+    </script>
+}
